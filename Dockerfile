@@ -9,11 +9,12 @@ ARG VERSION=0.0.0
 FROM node:22.11.0-slim
 
 ARG VERSION
+ARG TARGETARCH
 ENV VERSION=${VERSION}
 
-# 安裝 curl, unzip, kubectl
-RUN apt-get update && apt-get install -y curl unzip \
-    && curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" \
+# 安裝目標平台對應架構的 kubectl
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates curl unzip \
+    && curl -fsSLo kubectl "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/${TARGETARCH}/kubectl" \
     && install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl \
     && rm kubectl \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
