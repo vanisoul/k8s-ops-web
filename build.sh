@@ -18,6 +18,7 @@ while IFS= read -r line; do
   case "${trimmed_line}" in
     "Platforms:"*)
       AVAILABLE_PLATFORMS="${trimmed_line#Platforms: }"
+      AVAILABLE_PLATFORMS="${AVAILABLE_PLATFORMS#"${AVAILABLE_PLATFORMS%%[![:space:]]*}"}"
       break
       ;;
   esac
