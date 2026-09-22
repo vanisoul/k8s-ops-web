@@ -1,5 +1,9 @@
-const NAMESPACE = process.env.NAMESPACE || "soulmask";
-const DEPLOYMENT = process.env.DEPLOYMENT || "soulmask";
+const NAMESPACE = process.env.NAMESPACE;
+const DEPLOYMENT = process.env.DEPLOYMENT;
+
+if (!NAMESPACE || !DEPLOYMENT) {
+  throw new Error("NAMESPACE and DEPLOYMENT environment variables are required");
+}
 
 async function runCommand(args: string[]): Promise<{ stdout: string; stderr: string; exitCode: number }> {
   try {

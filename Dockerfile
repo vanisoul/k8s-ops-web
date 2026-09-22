@@ -1,5 +1,5 @@
 # docker build 範例
-# docker build . --build-arg VERSION=1.0.0 -t soulmask-ops-web:1.0.0
+# docker build . --build-arg VERSION=1.0.0 -t k8s-ops-web:1.0.0
 
 # docker compose 範例
 # docker compose up -d

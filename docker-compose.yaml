@@ -1,16 +1,16 @@
 services:
-  soulmask-ops-web:
+  k8s-ops-web:
     build:
       context: .
       args:
         VERSION: "1.0.0"
-    image: soulmask-ops-web:1.0.0
-    container_name: soulmask-ops-web
+    image: k8s-ops-web:1.0.0
+    container_name: k8s-ops-web
     ports:
       - "3000:3000"
     environment:
-      - NAMESPACE=soulmask
-      - DEPLOYMENT=soulmask
+      - NAMESPACE=${NAMESPACE:?Set NAMESPACE to the target Kubernetes namespace}
+      - DEPLOYMENT=${DEPLOYMENT:?Set DEPLOYMENT to the target Deployment name}
       - PORT=3000
       - KUBECONFIG=/root/.kube/config
     volumes:

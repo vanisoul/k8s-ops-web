@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "soulmask-ops-web",
+      "name": "k8s-ops-web",
       "dependencies": {
         "hono": "^4.7.0",
       },
