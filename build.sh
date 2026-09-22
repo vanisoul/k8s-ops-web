@@ -3,7 +3,7 @@ set -e
 
 # 設定變數
 IMAGE_REPO="${IMAGE_REPO:-hub.docker.com}"
-IMAGE_NAME="soulmask-ops-web"
+IMAGE_NAME="k8s-ops-web"
 VERSION="${1:-latest}"
 PLATFORMS="${PLATFORMS:-linux/amd64,linux/arm64}"
 

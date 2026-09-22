@@ -38,7 +38,7 @@ app.get("/api/status", async (c) => {
 });
 
 const port = Number(process.env.PORT || "3000");
-console.log(`Soulmask Ops Web listening on port ${port}`);
+console.log(`Kubernetes Ops Web listening on port ${port}`);
 
 export default {
   port,
@@ -50,7 +50,7 @@ const indexHtml = `<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Soulmask Ops</title>
+<title>Kubernetes Ops</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f172a; color: #e2e8f0; min-height: 100vh; padding: 20px; }
@@ -81,7 +81,7 @@ const indexHtml = `<!DOCTYPE html>
 </head>
 <body>
 <div class="container">
-  <h1>Soulmask Ops Controller</h1>
+  <h1>Kubernetes Ops Controller</h1>
 
   <!-- Status Card -->
   <div class="card">
@@ -150,7 +150,7 @@ async function loadStatus() {
 }
 
 async function doRestart() {
-  if (!confirm('確定要重啟 Soulmask Deployment？伺服器將會短暫離線。')) return;
+  if (!confirm('確定要重啟此 Deployment？服務將會短暫離線。')) return;
   const btn = document.getElementById('restartBtn');
   const msg = document.getElementById('restartMsg');
   btn.disabled = true;

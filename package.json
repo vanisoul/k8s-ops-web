@@ -1,5 +1,5 @@
 {
-  "name": "soulmask-ops-web",
+  "name": "k8s-ops-web",
   "version": "1.0.0",
   "scripts": {
     "start": "bun run src/index.ts",
