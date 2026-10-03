@@ -18,7 +18,13 @@ app.post("/api/restart", async (c) => {
 // API: Get pod logs
 app.get("/api/logs", async (c) => {
   const tail = Number(c.req.query("tail") || "200");
-  const result = await getPodLogs(tail);
+  const search = c.req.query("search")?.trim();
+  const result = await getPodLogs(search ? -1 : tail);
+  if (result.success && search) {
+    result.logs = result.logs.split(/\r?\n/).filter((line) =>
+      line.toLowerCase().includes(search.toLowerCase())
+    ).join("\n");
+  }
   const status = result.success ? 200 : 500;
   return c.json({ ...result, timestamp: new Date().toISOString() }, status);
 });
@@ -66,6 +72,8 @@ const indexHtml = `<!DOCTYPE html>
   .btn-primary:hover { background: #3b82f6; }
   .btn-sm { padding: 6px 14px; font-size: 0.85rem; }
   .log-box { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 12px; font-family: 'Menlo', 'Courier New', monospace; font-size: 0.8rem; line-height: 1.5; max-height: 400px; overflow-y: auto; white-space: pre-wrap; word-break: break-all; }
+  .log-search { display: flex; gap: 8px; margin-bottom: 12px; }
+  .log-search input { flex: 1; min-width: 0; padding: 8px 12px; border: 1px solid #475569; border-radius: 8px; background: #0f172a; color: #e2e8f0; font-size: 0.9rem; }
   .status-box { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 12px; font-family: monospace; font-size: 0.85rem; white-space: pre-wrap; }
   .toolbar { display: flex; gap: 8px; align-items: center; margin-bottom: 12px; }
   .toolbar .spacer { flex: 1; }
@@ -119,6 +127,10 @@ const indexHtml = `<!DOCTYPE html>
       <div class="spacer"></div>
       <button class="btn btn-primary btn-sm" onclick="loadLogs()">重新整理</button>
     </div>
+    <form class="log-search" onsubmit="event.preventDefault(); loadLogs()">
+      <input id="logSearch" type="search" placeholder="搜尋 Log 關鍵字" aria-label="搜尋 Log 關鍵字">
+      <button class="btn btn-primary btn-sm" type="submit">Search Log</button>
+    </form>
     <div id="logContent" class="log-box loading">載入中...</div>
   </div>
 </div>
@@ -173,11 +185,12 @@ async function loadResources() {
 
 async function loadLogs() {
   const el = document.getElementById('logContent');
+  const search = document.getElementById('logSearch').value.trim();
   el.textContent = '載入中...';
-  const data = await api('GET', '/api/logs');
-  el.textContent = data.logs || '無日誌';
+  const data = await api('GET', '/api/logs' + (search ? '?search=' + encodeURIComponent(search) : ''));
+  el.textContent = data.success ? (data.logs || (search ? '找不到符合的日誌' : '無日誌')) : (data.logs || data.message || '無法取得日誌');
   el.className = 'log-box';
-  el.scrollTop = el.scrollHeight;
+  el.scrollTop = search ? 0 : el.scrollHeight;
 }
 
 // Initial load
