@@ -13,6 +13,15 @@ services:
       - DEPLOYMENT=${DEPLOYMENT:?Set DEPLOYMENT to the target Deployment name}
       - PORT=3000
       - KUBECONFIG=/root/.kube/config
+      - PROVIDERS_CONFIG_PATH=${PROVIDERS_CONFIG_PATH:-/app/config/providers.json}
+      - HOOKS_CONFIG_PATH=${HOOKS_CONFIG_PATH:-/app/config/hooks.json}
+      - AVAILABLE_INTERVAL_SECONDS=${AVAILABLE_INTERVAL_SECONDS:-10}
+      - UNAVAILABLE_INTERVAL_SECONDS=${UNAVAILABLE_INTERVAL_SECONDS:-10}
+      - LOG_REGEX_INTERVAL_SECONDS=${LOG_REGEX_INTERVAL_SECONDS:-10}
+      - DISCORD_STATUS_WEBHOOK_URL=${DISCORD_STATUS_WEBHOOK_URL:?Set DISCORD_STATUS_WEBHOOK_URL to the server status Discord webhook}
+      - DISCORD_PLAYER_WEBHOOK_URL=${DISCORD_PLAYER_WEBHOOK_URL:?Set DISCORD_PLAYER_WEBHOOK_URL to the player join Discord webhook}
     volumes:
       - ${KUBECONFIG:-~/.kube/config}:/root/.kube/config:ro
+      - ./config/providers.json:/app/config/providers.json:ro
+      - ./config/hooks.json:/app/config/hooks.json:ro
     restart: unless-stopped

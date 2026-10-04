@@ -1,0 +1,18 @@
+{
+  "providers": [
+    {
+      "name": "server-status",
+      "type": "discord",
+      "urlEnv": "DISCORD_STATUS_WEBHOOK_URL",
+      "queueLimit": 20,
+      "intervalSeconds": 1
+    },
+    {
+      "name": "player-join",
+      "type": "discord",
+      "urlEnv": "DISCORD_PLAYER_WEBHOOK_URL",
+      "queueLimit": 20,
+      "intervalSeconds": 1
+    }
+  ]
+}
