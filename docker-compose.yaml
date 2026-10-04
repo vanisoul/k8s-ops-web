@@ -11,6 +11,7 @@ services:
     environment:
       - NAMESPACE=${NAMESPACE:?Set NAMESPACE to the target Kubernetes namespace}
       - DEPLOYMENT=${DEPLOYMENT:?Set DEPLOYMENT to the target Deployment name}
+      - POD_LABEL_KEY=${POD_LABEL_KEY:-app}
       - PORT=3000
       - KUBECONFIG=/root/.kube/config
       - PROVIDERS_CONFIG_PATH=${PROVIDERS_CONFIG_PATH:-/app/config/providers.json}

@@ -1,6 +1,7 @@
 import { afterEach, expect, test } from "bun:test";
 import { discordContent } from "./discord";
 import { loadHookSettings } from "./hook-settings";
+import { enqueue, flush } from "./message-queue";
 
 const originalStatusUrl = process.env.DISCORD_STATUS_WEBHOOK_URL;
 const originalPlayerUrl = process.env.DISCORD_PLAYER_WEBHOOK_URL;
@@ -39,4 +40,17 @@ test("Discord clipping preserves both overflow and dropped-message notices", () 
   expect(Array.from(emoji).length).toBeLessThanOrEqual(2000);
   expect(Array.from(emoji).slice(0, 1800).join("")).toBe("🎮".repeat(1800));
   expect(emoji).toContain("已丟棄 2 筆");
+});
+
+test("hook buffer and provider queue overflow retain first messages and count every loss", () => {
+  const pending = { entries: [] as string[], dropped: 0 };
+  for (const message of ["L1", "L2", "L3", "L4"]) enqueue(pending, message, 3);
+  expect(pending).toEqual({ entries: ["L1", "L2", "L3"], dropped: 1 });
+  const provider = { entries: ["previous"], dropped: 0 };
+  flush(pending, provider, 2);
+  expect(provider).toEqual({ entries: ["previous", "L1"], dropped: 3 });
+  expect(pending).toEqual({ entries: [], dropped: 0 });
+  const content = discordContent(provider.entries, provider.dropped);
+  expect(content).toContain("previous\nL1");
+  expect(content).toContain("已丟棄 3 筆");
 });

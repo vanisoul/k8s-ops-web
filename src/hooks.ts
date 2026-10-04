@@ -1,18 +1,12 @@
 import { followLogs, getAvailability, getLogSources, type LogSource } from "./kubectl";
 import { interval, loadHookSettings, type Hook, type Provider } from "./hook-settings";
 import { discordContent } from "./discord";
+import { enqueue, flush, type MessageQueue } from "./message-queue";
 
-type Pending = { entries: string[]; dropped: number };
-type Sender = Pending & { provider: Provider; busy: boolean; retryAt: number };
+type Sender = MessageQueue & { provider: Provider; busy: boolean; retryAt: number };
 
 function report(source: string, count: number, reason: string) {
   if (count) console.error(`${source}: ${count} messages dropped (${reason})`);
-}
-
-function enqueue(sender: Sender, message: string) {
-  if (sender.entries.length >= sender.provider.queueLimit) {
-    sender.dropped++;
-  } else sender.entries.push(message);
 }
 
 async function send(sender: Sender) {
@@ -45,24 +39,24 @@ async function send(sender: Sender) {
 }
 
 function dispatch(hook: Hook, message: string, senders: Map<string, Sender>) {
-  for (const name of hook.providers) enqueue(senders.get(name)!, message);
+  for (const name of hook.providers) {
+    const sender = senders.get(name)!;
+    enqueue(sender, message, sender.provider.queueLimit);
+  }
 }
 
-function bufferLog(hook: Hook, line: string, pending: Pending) {
+function bufferLog(hook: Hook, line: string, pending: MessageQueue) {
   const match = hook.regex!.exec(line);
   if (!match) return;
   const message = hook.message.replace(/{{\s*([^{}]+?)\s*}}/g, (_, name: string) => match.groups?.[name] ?? "");
-  if (pending.entries.length >= hook.bufferLimit) {
-    pending.dropped++;
-  } else pending.entries.push(message);
+  enqueue(pending, message, hook.bufferLimit);
 }
 
-function flushLog(hook: Hook, pending: Pending, senders: Map<string, Sender>) {
+function flushLog(hook: Hook, pending: MessageQueue, senders: Map<string, Sender>) {
   report(hook.name, pending.dropped, "hook buffer full");
   for (const name of hook.providers) {
     const sender = senders.get(name)!;
-    for (const entry of pending.entries) enqueue(sender, entry);
-    sender.dropped += pending.dropped;
+    flush({ entries: [...pending.entries], dropped: pending.dropped }, sender, sender.provider.queueLimit);
   }
   pending.entries.length = 0;
   pending.dropped = 0;
@@ -79,7 +73,7 @@ export function startHooks(): void {
   const senders = new Map(settings.providers.map((provider) => [provider.name,
     { provider, entries: [], dropped: 0, busy: false, retryAt: 0 } as Sender]));
   const logHooks = settings.hooks.filter((hook) => hook.type === "logRegex");
-  const pending = new Map(logHooks.map((hook) => [hook.name, { entries: [], dropped: 0 } as Pending]));
+  const pending = new Map(logHooks.map((hook) => [hook.name, { entries: [], dropped: 0 } as MessageQueue]));
   const started = new Date(Date.now() - 1);
   const streams = new Map<string, Stream>();
   const missing = new Map<string, number>();

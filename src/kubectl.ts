@@ -1,8 +1,12 @@
 const NAMESPACE = process.env.NAMESPACE;
 const DEPLOYMENT = process.env.DEPLOYMENT;
+const POD_LABEL_KEY = process.env.POD_LABEL_KEY || "app";
 
 if (!NAMESPACE || !DEPLOYMENT) {
   throw new Error("NAMESPACE and DEPLOYMENT environment variables are required");
+}
+if (!/^(?:[a-z0-9]([-a-z0-9_.]*[a-z0-9])?\/)?[a-z0-9]([-a-z0-9_.]*[a-z0-9])?$/.test(POD_LABEL_KEY)) {
+  throw new Error("POD_LABEL_KEY must be a valid Kubernetes label key");
 }
 
 export async function runCommand(args: string[]): Promise<{ stdout: string; stderr: string; exitCode: number }> {
@@ -42,7 +46,7 @@ export async function getAvailability(): Promise<boolean | null> {
 export type LogSource = { pod: string; container: string; id: string };
 
 export async function getLogSources(): Promise<LogSource[] | null> {
-  const result = await runCommand(["get", "pods", "-n", NAMESPACE!, "-l", `app=${DEPLOYMENT}`, "-o", "json"]);
+  const result = await runCommand(["get", "pods", "-n", NAMESPACE!, "-l", `${POD_LABEL_KEY}=${DEPLOYMENT}`, "-o", "json"]);
   if (result.exitCode !== 0) {
     console.error(`Cannot list log pods: ${result.stderr}`);
     return null;
@@ -100,7 +104,7 @@ export async function restartDeployment(): Promise<{ success: boolean; message: 
 export async function getPodLogs(tailLines = 200): Promise<{ success: boolean; logs: string }> {
   // Get pod name first
   const pods = await runCommand([
-    "get", "pods", "-n", NAMESPACE, "-l", `app=${DEPLOYMENT}`,
+    "get", "pods", "-n", NAMESPACE, "-l", `${POD_LABEL_KEY}=${DEPLOYMENT}`,
     "-o", "jsonpath={.items[0].metadata.name}",
   ]);
 
