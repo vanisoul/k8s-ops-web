@@ -1,0 +1,23 @@
+{
+  "hooks": [
+    {
+      "name": "ntfy-available",
+      "type": "available",
+      "message": "[ntfy 測試] 服務可用",
+      "providers": ["ntfy-test"]
+    },
+    {
+      "name": "ntfy-unavailable",
+      "type": "unavailable",
+      "message": "[ntfy 測試] 服務不可用",
+      "providers": ["ntfy-test"]
+    },
+    {
+      "name": "ntfy-stats",
+      "type": "logRegex",
+      "regex": "INFO Server stats .*messages_published=(?<count>\\d+)",
+      "message": "[ntfy 測試] messages_published={{count}}",
+      "providers": ["ntfy-test"]
+    }
+  ]
+}

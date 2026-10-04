@@ -1,0 +1,30 @@
+{
+  "hooks": [
+    {
+      "name": "server-starting",
+      "type": "available",
+      "message": "伺服器啟動中",
+      "providers": ["server-status"]
+    },
+    {
+      "name": "server-ready",
+      "type": "logRegex",
+      "regex": "Server startup complete",
+      "message": "伺服器啟動完成",
+      "providers": ["server-status"]
+    },
+    {
+      "name": "server-closed",
+      "type": "unavailable",
+      "message": "伺服器已關閉",
+      "providers": ["server-status"]
+    },
+    {
+      "name": "player-joined",
+      "type": "logRegex",
+      "regex": "Player (?<id>[A-Za-z0-9_-]+) joined the server",
+      "message": "玩家 {{id}} 已加入伺服器",
+      "providers": ["player-join"]
+    }
+  ]
+}

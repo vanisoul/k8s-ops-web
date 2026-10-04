@@ -1,5 +1,8 @@
 import { Hono } from "hono";
 import { restartDeployment, getPodLogs, getPodResources, getStatus } from "./kubectl";
+import { startHooks } from "./hooks";
+
+startHooks();
 
 const app = new Hono();
 

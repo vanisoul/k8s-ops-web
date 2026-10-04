@@ -1,0 +1,11 @@
+{
+  "providers": [
+    {
+      "name": "ntfy-test",
+      "type": "discord",
+      "urlEnv": "DEV_DISCORD_URL",
+      "queueLimit": 20,
+      "intervalSeconds": 1
+    }
+  ]
+}
