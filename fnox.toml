@@ -1,0 +1,8 @@
+env = true
+
+[providers.bitwarden]
+type = "bitwarden"
+organization_id = "471c5f8c-e885-4180-a429-0be65787f3a7"
+
+[secrets]
+DEV_DISCORD_URL = { provider = "bitwarden", value = "k8s-ops-web::discord::hook::url/password", if_missing = "error" }
