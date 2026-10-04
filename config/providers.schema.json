@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "通知目的地設定",
+  "type": "object",
+  "required": ["providers"],
+  "properties": {
+    "providers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "type"],
+        "anyOf": [{ "required": ["url"] }, { "required": ["urlEnv"] }],
+        "properties": {
+          "name": { "type": "string", "minLength": 1 },
+          "type": { "const": "discord" },
+          "url": { "type": "string", "minLength": 1, "description": "須為 Discord HTTPS webhook 網址；若與 urlEnv 並存，優先使用此欄位" },
+          "urlEnv": { "type": "string", "minLength": 1, "description": "存放 Discord webhook 網址的環境變數名稱" },
+          "queueLimit": { "type": "integer", "minimum": 1, "default": 20 },
+          "intervalSeconds": { "type": "integer", "minimum": 1, "default": 1 }
+        }
+      }
+    }
+  }
+}
